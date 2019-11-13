@@ -49,34 +49,71 @@ import com.alibaba.druid.wall.violation.ErrorCode;
 import com.alibaba.druid.wall.violation.IllegalSQLObjectViolation;
 import com.alibaba.druid.wall.violation.SyntaxErrorViolation;
 
+/**
+ * 当执行sql 做一些数据统计
+ */
 public abstract class WallProvider {
 
+    /**
+     * 该提供者的名字
+     */
     private String                                        name;
 
+    /**
+     * 内部包含的 属性   concurrencyLevel 代表预估的并发级别 用于辅助确定初始size大小的
+     */
     private final Map<String, Object>                     attributes              = new ConcurrentHashMap<String, Object>(
                                                                                                                           1,
                                                                                                                           0.75f,
                                                                                                                           1);
 
+    /**
+     * 是否开启白名单
+     */
     private boolean                                       whiteListEnable         = true;
+    /**
+     * 白名单列表  当列表超过 最大长度时 再往里面添加会剔除掉 最早的数据
+     * 这里 key 应该是sql value 是统计对象
+     */
     private LRUCache<String, WallSqlStat>                 whiteList;
 
+    /**
+     * 允许的sql最大长度
+     */
     private int                                           MAX_SQL_LENGTH          = 8192;                                              // 8k
 
+    /**
+     * 白名单sql 最大长度
+     */
     private int                                           whiteSqlMaxSize         = 1000;
 
+    /**
+     * 是否开启黑名单
+     */
     private boolean                                       blackListEnable         = true;
     private LRUCache<String, WallSqlStat>                 blackList;
+    /**
+     * 黑名单整合列表???
+     */
     private LRUCache<String, WallSqlStat>                 blackMergedList;
 
     private int                                           blackSqlMaxSize         = 200;
 
+    /**
+     * wall的配置信息
+     */
     protected final WallConfig                            config;
 
+    /**
+     * 读写锁
+     */
     private final ReentrantReadWriteLock                  lock                    = new ReentrantReadWriteLock();
 
     private static final ThreadLocal<Boolean>             privileged              = new ThreadLocal<Boolean>();
 
+    /**
+     * 方法级别统计
+     */
     private final ConcurrentMap<String, WallFunctionStat> functionStats           = new ConcurrentHashMap<String, WallFunctionStat>(
                                                                                                                                     16,
                                                                                                                                     0.75f,
@@ -86,11 +123,18 @@ public abstract class WallProvider {
                                                                                                                                  0.75f,
                                                                                                                                  1);
 
+    /**
+     * 本sql 被否决的相关数据统计
+     */
     public final WallDenyStat                             commentDeniedStat       = new WallDenyStat();
 
+    /**
+     * db类型
+     */
     protected String                                      dbType                  = null;
     protected final AtomicLong                            checkCount              = new AtomicLong();
     protected final AtomicLong                            hardCheckCount          = new AtomicLong();
+    // 命中 名单次数
     protected final AtomicLong                            whiteListHitCount       = new AtomicLong();
     protected final AtomicLong                            blackListHitCount       = new AtomicLong();
     protected final AtomicLong                            syntaxErrorCount        = new AtomicLong();
@@ -138,6 +182,11 @@ public abstract class WallProvider {
         return this.functionStats;
     }
 
+    /**
+     * 获取某条sql 对应的统计信息
+     * @param sql
+     * @return
+     */
     public WallSqlStat getSqlStat(String sql) {
         WallSqlStat sqlStat = this.getWhiteSql(sql);
 
@@ -444,6 +493,11 @@ public abstract class WallProvider {
         }
     }
 
+    /**
+     * 从白名单中获取对应统计对象
+     * @param sql
+     * @return
+     */
     public WallSqlStat getWhiteSql(String sql) {
         WallSqlStat stat = null;
         lock.readLock().lock();
@@ -460,6 +514,7 @@ public abstract class WallProvider {
             return stat;
         }
 
+        // 当没有从白名单找到sql时  对该sql 进行处理
         String mergedSql;
         try {
             mergedSql = ParameterizedOutputVisitorUtils.parameterize(sql, dbType, (List<Object>) null);
@@ -470,6 +525,7 @@ public abstract class WallProvider {
 
         lock.readLock().lock();
         try {
+            // 重新去白名单中查找
             stat = whiteList.get(mergedSql);
         } finally {
             lock.readLock().unlock();

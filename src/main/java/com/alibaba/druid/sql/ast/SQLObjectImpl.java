@@ -22,28 +22,49 @@ import java.util.Map;
 
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 
+/**
+ * 该对象作为 一个骨架类
+ */
 public abstract class SQLObjectImpl implements SQLObject {
 
+    /**
+     * 该sqlObject 的父对象
+     */
     protected SQLObject           parent;
+    /**
+     * 获取对应的一组属性
+     */
     protected Map<String, Object> attributes;
 
     public SQLObjectImpl(){
     }
 
+    /**
+     * 该对象接受一组观察者
+     * @param visitor
+     */
     public final void accept(SQLASTVisitor visitor) {
         if (visitor == null) {
             throw new IllegalArgumentException();
         }
 
+        // 前置钩子
         visitor.preVisit(this);
 
+        // 该方法由子类实现
         accept0(visitor);
 
+        // 后置钩子
         visitor.postVisit(this);
     }
 
     protected abstract void accept0(SQLASTVisitor visitor);
 
+    /**
+     * 批量触发 accept
+     * @param visitor
+     * @param children
+     */
     protected final void acceptChild(SQLASTVisitor visitor, List<? extends SQLObject> children) {
         if (children == null) {
             return;
@@ -62,6 +83,10 @@ public abstract class SQLObjectImpl implements SQLObject {
         child.accept(visitor);
     }
 
+    /**
+     * 将结果输出到 stringBuf 中
+     * @param buf
+     */
     public void output(StringBuffer buf) {
         buf.append(super.toString());
     }
@@ -72,6 +97,10 @@ public abstract class SQLObjectImpl implements SQLObject {
         return buf.toString();
     }
 
+    /**
+     * 获取父对象
+     * @return
+     */
     public SQLObject getParent() {
         return parent;
     }
@@ -80,6 +109,10 @@ public abstract class SQLObjectImpl implements SQLObject {
         this.parent = parent;
     }
 
+    /**
+     * 获取属性
+     * @return
+     */
     public Map<String, Object> getAttributes() {
         if (attributes == null) {
             attributes = new HashMap<String, Object>(1);
@@ -115,7 +148,11 @@ public abstract class SQLObjectImpl implements SQLObject {
     public Map<String, Object> getAttributesDirect() {
         return attributes;
     }
-    
+
+    /**
+     * 追加前置注释信息  实际上就是保存在 attr 中
+     * @param comment
+     */
     @SuppressWarnings("unchecked")
     public void addBeforeComment(String comment) {
         if (comment == null) {
@@ -134,7 +171,7 @@ public abstract class SQLObjectImpl implements SQLObject {
         
         comments.add(comment);
     }
-    
+
     @SuppressWarnings("unchecked")
     public void addBeforeComment(List<String> comments) {
         if (attributes == null) {
@@ -145,6 +182,7 @@ public abstract class SQLObjectImpl implements SQLObject {
         if (attrComments == null) {
             attributes.put("format.before_comment", comments);
         } else {
+            // ??? 这里为什么不像上面一样的写法
             attrComments.addAll(comments);
         }
     }
@@ -190,7 +228,11 @@ public abstract class SQLObjectImpl implements SQLObject {
             attrComments.addAll(comments);
         }
     }
-    
+
+    /**
+     * 从 attr 容器中获取后置评论
+     * @return
+     */
     @SuppressWarnings("unchecked")
     public List<String> getAfterCommentsDirect() {
         if (attributes == null) {

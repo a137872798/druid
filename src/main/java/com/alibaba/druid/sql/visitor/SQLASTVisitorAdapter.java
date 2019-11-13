@@ -94,7 +94,14 @@ import com.alibaba.druid.sql.ast.statement.SQLMergeStatement.MergeUpdateClause;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 适配器对象 就是生成一系列默认方法 这样子类只需要实现目标方法就可以
+ */
 public class SQLASTVisitorAdapter implements SQLASTVisitor {
+
+    /**
+     * 标识该监听器有多少特性
+     */
     protected int features;
 
     public void endVisit(SQLAllColumnExpr x) {

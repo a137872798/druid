@@ -25,6 +25,9 @@ import com.alibaba.druid.support.monitor.annotation.MTable;
 @MTable(name = "druid_wall_sql")
 public class WallSqlStatValue {
 
+    /**
+     * 本拦截的sql
+     */
     private String  sql;
 
     @MField(groupBy = true, aggregate = AggregateType.None, hashFor = "sql", hashForType = "sql")

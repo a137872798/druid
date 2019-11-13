@@ -18,8 +18,14 @@ package com.alibaba.druid.sql.ast;
 import com.alibaba.druid.sql.visitor.SQLASTOutputVisitor;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 
+/**
+ * 注释线索对象
+ */
 public class SQLCommentHint extends SQLObjectImpl implements SQLHint {
 
+    /**
+     * 注释文本
+     */
     private String text;
 
     public SQLCommentHint(){
@@ -39,8 +45,14 @@ public class SQLCommentHint extends SQLObjectImpl implements SQLHint {
         this.text = text;
     }
 
+    /**
+     * 当传入一个观察者时触发
+     * @param visitor
+     */
     protected void accept0(SQLASTVisitor visitor) {
+        // 触发 观察方法
         visitor.visit(this);
+        // 后置函数
         visitor.endVisit(this);
     }
 

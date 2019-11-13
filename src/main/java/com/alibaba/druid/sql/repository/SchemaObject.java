@@ -20,9 +20,14 @@ import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
 
 /**
  * Created by wenshao on 03/06/2017.
+ * 模式对象
  */
 public interface SchemaObject {
 
+    /**
+     * 获取会话对象
+     * @return
+     */
     SQLStatement getStatement();
 
     SQLColumnDefinition findColumn(String columName);

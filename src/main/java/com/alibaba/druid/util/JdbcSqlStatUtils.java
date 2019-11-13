@@ -70,6 +70,14 @@ public class JdbcSqlStatUtils {
         }
     }
 
+    /**
+     * 获取 updater 对应的值
+     * @param stat
+     * @param updater
+     * @param reset  如果需要重置 那么在获取该数值后 将对应字段置0
+     * @param <T>
+     * @return
+     */
     public static <T> long get(T stat, AtomicLongFieldUpdater<T> updater, boolean reset) {
         if (reset) {
             return updater.getAndSet(stat, 0);

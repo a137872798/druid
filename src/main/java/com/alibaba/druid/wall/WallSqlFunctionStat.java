@@ -15,8 +15,14 @@
  */
 package com.alibaba.druid.wall;
 
+/**
+ * 针对方法级别的统计信息
+ */
 public class WallSqlFunctionStat {
 
+    /**
+     * 调用次数
+     */
     private int invokeCount;
 
     public int getInvokeCount() {

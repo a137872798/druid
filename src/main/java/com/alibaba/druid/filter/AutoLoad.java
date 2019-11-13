@@ -21,6 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 自动加载注解
  * @author sandzhang [sandzhagntoo@gmail.com]
  */
 

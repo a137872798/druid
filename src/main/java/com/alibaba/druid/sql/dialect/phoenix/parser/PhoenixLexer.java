@@ -51,6 +51,6 @@ public class PhoenixLexer extends Lexer {
 
     public PhoenixLexer(String input){
         super(input);
-        super.keywods = DEFAULT_PHOENIX_KEYWORDS;
+        super.keywords = DEFAULT_PHOENIX_KEYWORDS;
     }
 }

@@ -387,6 +387,11 @@ public class StringUtils {
         return new String(chars);
     }
 
+    /**
+     * 从该字符串中移除 名字引用的部分
+     * @param s
+     * @return
+     */
     public static String removeNameQuotes(String s) {
         if (s == null || s.length() <= 1) {
             return null;
@@ -395,6 +400,7 @@ public class StringUtils {
         char c0 = s.charAt(0);
         char last = s.charAt(len - 1);
 
+        // 如果 字符串 被 `` 或者 \'  \' \"  \"  包裹 那么去除掉包裹部分   \ 看来是转移符  实际上 如果字符串被 `` ''  "" 包裹 就去除掉
         if (c0 == last && (c0 == '`' || c0 == '\'' || c0 == '\"') ) {
             return s.substring(1, len - 1);
         }

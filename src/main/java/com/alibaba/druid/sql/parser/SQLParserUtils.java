@@ -68,7 +68,16 @@ public class SQLParserUtils {
         return createSQLStatementParser(sql, dbType, features);
     }
 
+    /**
+     * 创建sql会话解析器
+     * @param sql   原始的sql语句
+     * @param dbType   db类型
+     * @param features   一组特性信息
+     * @return
+     */
     public static SQLStatementParser createSQLStatementParser(String sql, String dbType, SQLParserFeature... features) {
+        // 根据db 类型生成不同的 sql解析器  有些解析器支持一些特性 那么就在构造时设置进去
+
         if (JdbcUtils.ORACLE.equals(dbType) || JdbcUtils.ALI_ORACLE.equals(dbType)) {
             return new OracleStatementParser(sql);
         }
@@ -117,6 +126,12 @@ public class SQLParserUtils {
         return new SQLStatementParser(sql, dbType);
     }
 
+    /**
+     * 根据sql 和 db类型 生成sql表达式解析对象
+     * @param sql
+     * @param dbType
+     * @return
+     */
     public static SQLExprParser createExprParser(String sql, String dbType) {
         if (JdbcUtils.ORACLE.equals(dbType) || JdbcUtils.ALI_ORACLE.equals(dbType)) {
             return new OracleExprParser(sql);

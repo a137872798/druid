@@ -22,13 +22,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 
+/**
+ * 被拦截的sql 的统计信息  如果每次传入的参数不同 那么应该是算作不同的sql吗???
+ */
 public class WallSqlStat {
 
+    /**
+     * 该sql的执行次数
+     */
     private volatile long                            executeCount;
+    /**
+     * 该sql的错误次数
+     */
     private volatile long                            executeErrorCount;
+    /**
+     * 结果行数
+     */
     private volatile long                            fetchRowCount;
+    /**
+     * 更新次数
+     */
     private volatile long                            updateCount;
 
+    // 这里字段都通过 CAS 进行更新
     final static AtomicLongFieldUpdater<WallSqlStat> executeCountUpdater      = AtomicLongFieldUpdater.newUpdater(WallSqlStat.class,
                                                                                                                   "executeCount");
     final static AtomicLongFieldUpdater<WallSqlStat> executeErrorCountUpdater = AtomicLongFieldUpdater.newUpdater(WallSqlStat.class,
@@ -38,20 +54,45 @@ public class WallSqlStat {
                                                                                                                   "fetchRowCount");
     final static AtomicLongFieldUpdater<WallSqlStat> updateCountUpdater       = AtomicLongFieldUpdater.newUpdater(WallSqlStat.class,
                                                                                                                   "updateCount");
+    /**
+     * 以表 和 表为单位的统计信息构成的映射
+     */
     private final Map<String, WallSqlTableStat>      tableStats;
 
+    /**
+     * 维护的异常信息
+     */
     private final List<Violation>                    violations;
 
+    /**
+     * 对应的方法名 和调用次数
+     */
     private final Map<String, WallSqlFunctionStat>   functionStats;
 
+    /**
+     * 是否发生了语法错误
+     */
     private final boolean                            syntaxError;
 
+    /**
+     * 样本
+     */
     private String                                   sample;
 
+    /**
+     * 本sql 的hash值
+     */
     private long                                     sqlHash;
 
+    /**
+     * 初始化 统计对象
+     * @param tableStats
+     * @param functionStats
+     * @param syntaxError
+     */
     public WallSqlStat(Map<String, WallSqlTableStat> tableStats, Map<String, WallSqlFunctionStat> functionStats,
                        boolean syntaxError){
+        // violations 默认是一个空容器
         this(tableStats, functionStats, Collections.<Violation> emptyList(), syntaxError);
     }
 
@@ -127,9 +168,17 @@ public class WallSqlStat {
         return syntaxError;
     }
 
+    // 上面都是一些简单的set/get/increment
+
+    /**
+     * 获取统计信息
+     * @param reset  是否重置
+     * @return
+     */
     public WallSqlStatValue getStatValue(boolean reset) {
         final WallSqlStatValue statValue = new WallSqlStatValue();
 
+        // 将数值转移到 statValue 中
         statValue.setExecuteCount(get(this, executeCountUpdater, reset));
         statValue.setExecuteErrorCount(get(this, executeErrorCountUpdater, reset));
         statValue.setFetchRowCount(get(this, fetchRowCountUpdater, reset));
@@ -137,6 +186,7 @@ public class WallSqlStat {
         statValue.setSyntaxError(this.syntaxError);
         statValue.setSqlSample(sample);
         if (violations.size() > 0) {
+            // 这里只设置一个 message
             String violationMessage = violations.get(0).getMessage();
             statValue.setViolationMessage(violationMessage);
         }

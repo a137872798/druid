@@ -20,9 +20,21 @@ import java.util.List;
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 
+/**
+ * 会话实现骨架类
+ */
 public abstract class SQLStatementImpl extends SQLObjectImpl implements SQLStatement {
+    /**
+     * 该db 的类型
+     */
     protected String               dbType;
+    /**
+     * 是否在分号后面???
+     */
     protected boolean              afterSemi;
+    /**
+     * 内部维护一组 注释信息
+     */
     protected List<SQLCommentHint> headHints;
 
     public SQLStatementImpl(){
@@ -45,6 +57,10 @@ public abstract class SQLStatementImpl extends SQLObjectImpl implements SQLState
         return SQLUtils.toSQLString(this, dbType);
     }
 
+    /**
+     * 返回小写后的数据
+     * @return
+     */
     public String toLowerCaseString() {
         return SQLUtils.toSQLString(this, dbType, SQLUtils.DEFAULT_LCASE_FORMAT_OPTION);
     }

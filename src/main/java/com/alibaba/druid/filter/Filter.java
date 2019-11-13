@@ -57,30 +57,92 @@ import com.alibaba.druid.proxy.jdbc.ResultSetProxy;
 import com.alibaba.druid.proxy.jdbc.StatementProxy;
 
 /**
+ * Wrapper 是 java.sql 的规范   在jdbc 编程中希望那些组件 比如 statement 有自己的额外特性 那么就要通过包装  isWrapperFor(Class iface) 代表该对象 是否是 iface的包装类 是的话返回true
+ * 这样就可以 使用iface 的一些方法了  也就是用于增强的接口
  * @author wenshao [szujobs@hotmail.com]
  */
 public interface Filter extends Wrapper {
 
+    /**
+     * 通过代理对象来初始化拦截器
+     * @param dataSource
+     */
     void init(DataSourceProxy dataSource);
 
+    /**
+     * 销毁该拦截器
+     */
     void destroy();
 
+    /**
+     * 通过传入的 prop 进行初始化
+     * @param properties
+     */
     void configFromProperties(Properties properties);
 
+    /**
+     * 判断该对象是否是 指定类型的包装器
+     * @param iface
+     * @return
+     */
     boolean isWrapperFor(java.lang.Class<?> iface);
 
+    /**
+     * 解除包装 可以理解为强转
+     * @param iface
+     * @param <T>
+     * @return
+     */
     <T> T unwrap(java.lang.Class<T> iface);
 
+    /**
+     * 生成连接代理对象
+     * @param chain
+     * @param info
+     * @return
+     * @throws SQLException
+     */
     ConnectionProxy connection_connect(FilterChain chain, Properties info) throws SQLException;
 
+    /**
+     * 创建会话对象
+     * @param chain
+     * @param connection
+     * @return
+     * @throws SQLException
+     */
     StatementProxy connection_createStatement(FilterChain chain, ConnectionProxy connection) throws SQLException;
 
+    /**
+     * 生成PS 代理对象
+     * @param chain
+     * @param connection
+     * @param sql
+     * @return
+     * @throws SQLException
+     */
     PreparedStatementProxy connection_prepareStatement(FilterChain chain, ConnectionProxy connection, String sql)
                                                                                                                  throws SQLException;
 
+    /**
+     * 生成 CS 代理对象
+     * @param chain
+     * @param connection
+     * @param sql
+     * @return
+     * @throws SQLException
+     */
     CallableStatementProxy connection_prepareCall(FilterChain chain, ConnectionProxy connection, String sql)
                                                                                                             throws SQLException;
 
+    /**
+     * 将sql 转换为适应引擎的sql
+     * @param chain
+     * @param connection
+     * @param sql
+     * @return
+     * @throws SQLException
+     */
     String connection_nativeSQL(FilterChain chain, ConnectionProxy connection, String sql) throws SQLException;
 
     void connection_setAutoCommit(FilterChain chain, ConnectionProxy connection, boolean autoCommit)

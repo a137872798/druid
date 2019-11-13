@@ -134,49 +134,105 @@ import com.alibaba.druid.sql.dialect.oracle.parser.OracleProcedureDataType;
 import com.alibaba.druid.util.JdbcConstants;
 import com.alibaba.druid.util.JdbcUtils;
 
+/**
+ * 该对象实现了 适配器的output 方法  同时实现参数化观察者接口
+ */
 public class SQLASTOutputVisitor extends SQLASTVisitorAdapter implements ParameterizedVisitor, PrintableVisitor {
     public static Boolean defaultPrintStatementAfterSemi;
 
     static {
         try {
+            // 当遇到分号后 打印日志
             defaultPrintStatementAfterSemi = getBoolean(System.getProperties(), "druid.sql.output.printStatementAfterSemi"); // compatible for early versions
         } catch (Throwable ex) {
             // skip
         }
     }
 
+    /**
+     * 可追加数据的对象
+     */
     protected final Appendable appender;
+    /**
+     * 缩进数量
+     */
     protected int indentCount = 0;
+    /**
+     * 是否开启大写
+     */
     protected boolean ucase = true;
+    /**
+     * 5条记录作为一行
+     */
     protected int selectListNumberOfLine = 5;
 
+    /**
+     * 同一组内是否在一行
+     */
     protected boolean groupItemSingleLine = false;
 
+    /**
+     * 获取一组参数信息
+     */
     protected List<Object> parameters;
+    /**
+     * 输入一组参数
+     */
     protected List<Object> inputParameters;
+    /**
+     * 表名
+     */
     protected Set<String>  tables;
     protected String       table; // for improved
 
+    /**
+     * 是否要输出表
+     */
     protected boolean exportTables = false;
 
+    /**
+     * db类型
+     */
     protected String dbType;
 
+    /**
+     * 表映射
+     */
     protected Map<String, String> tableMapping;
 
+    /**
+     * 替换数量
+     */
     protected int replaceCount;
 
+    /**
+     * 将参数整合到list中
+     */
     protected boolean parameterizedMergeInList = false;
+    /**
+     * 将?整合到list中
+     */
     protected boolean parameterizedQuesUnMergeInList = false;
 
+    /**
+     * 是否参数化
+     */
     protected boolean parameterized = false;
+    /**
+     * 是否支持共享
+     */
     protected boolean shardingSupport = false;
 
+    /**
+     * 总行数
+     */
     protected transient int lines = 0;
 
 
     protected Boolean printStatementAfterSemi = defaultPrintStatementAfterSemi;
 
     {
+        // 增加按照格式化输出的特性
         features |= VisitorFeature.OutputPrettyFormat.mask;
     }
 
@@ -203,11 +259,17 @@ public class SQLASTOutputVisitor extends SQLASTVisitorAdapter implements Paramet
         replaceCount++;
     }
 
+    /**
+     * 添加一个表映射关系
+     * @param srcTable  源表
+     * @param destTable   目标表
+     */
     public void addTableMapping(String srcTable, String destTable) {
         if (tableMapping == null) {
             tableMapping = new HashMap<String, String>();
         }
 
+        // 如果表名携带  .
         if (srcTable.indexOf('.') >= 0) {
             SQLExpr expr = SQLUtils.toSQLExpr(srcTable, dbType);
             if (expr instanceof SQLPropertyExpr) {
@@ -219,10 +281,18 @@ public class SQLASTOutputVisitor extends SQLASTVisitorAdapter implements Paramet
         tableMapping.put(srcTable, destTable);
     }
 
+    /**
+     * 外部设置表映射
+     * @param tableMapping
+     */
     public void setTableMapping(Map<String, String> tableMapping) {
         this.tableMapping = tableMapping;
     }
 
+    /**
+     * 生成参数列表
+     * @return
+     */
     public List<Object> getParameters() {
         if (parameters == null) {
             parameters = new ArrayList<Object>();
@@ -231,6 +301,10 @@ public class SQLASTOutputVisitor extends SQLASTVisitorAdapter implements Paramet
         return parameters;
     }
 
+    /**
+     * 是否对于输出不敏感  就是 features 是否包含 OutputDesensitize
+     * @return
+     */
     public boolean isDesensitize() {
         return isEnabled(VisitorFeature.OutputDesensitize);
     }
@@ -239,6 +313,10 @@ public class SQLASTOutputVisitor extends SQLASTVisitorAdapter implements Paramet
         config(VisitorFeature.OutputDesensitize, desensitize);
     }
 
+    /**
+     * 返回所有表名
+     * @return
+     */
     public Set<String> getTables() {
         if (this.table != null && this.tables == null) {
             return Collections.singleton(this.table);
@@ -255,12 +333,16 @@ public class SQLASTOutputVisitor extends SQLASTVisitorAdapter implements Paramet
         }
     }
 
+    /**
+     * 设置输入参数
+     * @param parameters
+     */
     public void setInputParameters(List<Object> parameters) {
         this.inputParameters = parameters;
     }
 
     /**
-     *
+     * 设置输出参数
      * @since 1.1.5
      */
     public void setOutputParameters(List<Object> parameters) {

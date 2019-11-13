@@ -15,6 +15,9 @@
  */
 package com.alibaba.druid;
 
+/**
+ * druid 内部使用的运行时异常
+ */
 public class DruidRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;

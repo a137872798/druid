@@ -43,6 +43,9 @@ public class ParameterizedOutputVisitorUtils {
             SQLParserFeature.OptimizedForParameterized
     };
 
+    /**
+     * 默认特性2
+     */
     private final static SQLParserFeature[] defaultFeatures2 = {
             SQLParserFeature.EnableSQLBinaryOpExprGroup,
             SQLParserFeature.UseInsertColumnsCache,
@@ -60,6 +63,13 @@ public class ParameterizedOutputVisitorUtils {
         return parameterize(sql, dbType, selectListCache, null);
     }
 
+    /**
+     * 参数化
+     * @param sql
+     * @param dbType
+     * @param outParameters
+     * @return
+     */
     public static String parameterize(String sql
             , String dbType
             , List<Object> outParameters) {
@@ -81,14 +91,25 @@ public class ParameterizedOutputVisitorUtils {
         return parameterize(sql, dbType, null, outParameters, features);
     }
 
+    /**
+     * 参数化
+     * @param sql   目标sql
+     * @param dbType   db类型
+     * @param selectListCache
+     * @param outParameters
+     * @param visitorFeatures
+     * @return
+     */
     public static String parameterize(String sql
             , String dbType
             , SQLSelectListCache selectListCache, List<Object> outParameters, VisitorFeature ...visitorFeatures) {
 
+        // 如果 参数为null 使用第二种默认特性
         final SQLParserFeature[] features = outParameters == null
                 ? defaultFeatures2
                 : defaultFeatures;
 
+        // 通过指定的特性生成 sql解析器
         SQLStatementParser parser = SQLParserUtils.createSQLStatementParser(sql, dbType, features);
 
         if (selectListCache != null) {

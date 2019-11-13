@@ -17,19 +17,51 @@ package com.alibaba.druid.sql.ast;
 
 import java.util.List;
 
+/**
+ * 数据类型
+ */
 public interface SQLDataType extends SQLObject {
 
+    /**
+     * 获取该类型的名称
+     * @return
+     */
     String getName();
 
+    /**
+     * 名称对应的hash值
+     * @return
+     */
     long nameHashCode64();
 
+    /**
+     * 设置名称
+     * @param name
+     */
     void setName(String name);
 
+    /**
+     * 获取参数信息
+     * @return 返回一组sql 表达式
+     */
     List<SQLExpr> getArguments();
 
+    /**
+     * 是否包含时区信息
+     * @return
+     */
     Boolean getWithTimeZone();
+
+    /**
+     * 设置时区信息
+     * @param value
+     */
     void  setWithTimeZone(Boolean value);
 
+    /**
+     * 是否包含本地时区
+     * @return
+     */
     boolean isWithLocalTimeZone();
     void setWithLocalTimeZone(boolean value);
 
@@ -38,6 +70,9 @@ public interface SQLDataType extends SQLObject {
     void setDbType(String dbType);
     String getDbType();
 
+    /**
+     * 数据类型  通过声明接口的方式来创建常量吗
+     */
     interface Constants {
         String CHAR = "CHAR";
         String NCHAR = "NCHAR";

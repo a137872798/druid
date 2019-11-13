@@ -42,6 +42,9 @@ import com.alibaba.druid.util.FnvHash;
 import com.alibaba.druid.util.ListDG;
 import com.alibaba.druid.util.lang.Consumer;
 
+/**
+ * 创建表会话类
+ */
 public class SQLCreateTableStatement extends SQLStatementImpl implements SQLDDLStatement, SQLCreateStatement {
 
     protected boolean                          ifNotExiists = false;

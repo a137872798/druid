@@ -54,12 +54,12 @@ public class HiveLexer extends Lexer {
 
     public HiveLexer(String input){
         super(input);
-        super.keywods = DEFAULT_HIVE_KEYWORDS;
+        super.keywords = DEFAULT_HIVE_KEYWORDS;
     }
 
     public HiveLexer(String input, SQLParserFeature... features){
         super(input);
-        super.keywods = DEFAULT_HIVE_KEYWORDS;
+        super.keywords = DEFAULT_HIVE_KEYWORDS;
         for (SQLParserFeature feature : features) {
             config(feature, true);
         }

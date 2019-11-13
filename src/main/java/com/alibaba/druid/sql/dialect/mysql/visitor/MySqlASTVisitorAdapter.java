@@ -134,6 +134,9 @@ import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlUpdateTableSource;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MysqlDeallocatePrepareStatement;
 import com.alibaba.druid.sql.visitor.SQLASTVisitorAdapter;
 
+/**
+ * mysqlObject监听器的 适配器对象  继承 普通sqlObject的适配器  用于实现一系列默认方法
+ */
 public class MySqlASTVisitorAdapter extends SQLASTVisitorAdapter implements MySqlASTVisitor {
 
     @Override

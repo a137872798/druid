@@ -17,6 +17,9 @@ package com.alibaba.druid;
 
 import java.sql.SQLException;
 
+/**
+ * 事务超时异常
+ */
 public class TransactionTimeoutException extends SQLException {
 
     private static final long serialVersionUID = 1L;

@@ -30,14 +30,23 @@ import com.alibaba.druid.support.logging.LogFactory;
 import com.alibaba.druid.util.JdbcUtils;
 import com.alibaba.druid.util.Utils;
 
+/**
+ * 过滤器管理器  实际上是一个 SPI 加载器
+ */
 public class FilterManager {
 
     private final static Log                               LOG      = LogFactory.getLog(FilterManager.class);
 
+    /**
+     * 通过一个并发容器来管理所有filter
+     * 比如  default,com.alibaba.druid.filter.stat.StatFilter
+     *       slf4j,com.alibaba.druid.filter.logging.Slf4jLogFilter
+     */
     private static final ConcurrentHashMap<String, String> aliasMap = new ConcurrentHashMap<String, String>(16, 0.75f, 1);
 
     static {
         try {
+            // 加载 key:value 的关系
             Properties filterProperties = loadFilterConfig();
             for (Map.Entry<Object, Object> entry : filterProperties.entrySet()) {
                 String key = (String) entry.getKey();
@@ -51,6 +60,11 @@ public class FilterManager {
         }
     }
 
+    /**
+     * 通过拦截器别名找到对应类的全限定名
+     * @param alias
+     * @return
+     */
     public static final String getFilter(String alias) {
         if (alias == null) {
             return null;
@@ -65,9 +79,15 @@ public class FilterManager {
         return filter;
     }
 
+    /**
+     * 加载过滤器的相关属性
+     * @return
+     * @throws IOException
+     */
     public static Properties loadFilterConfig() throws IOException {
         Properties filterProperties = new Properties();
 
+        // 尝试使用各种加载器 去加载配置信息  类加载器这块还需要理解下
         loadFilterConfig(filterProperties, ClassLoader.getSystemClassLoader());
         loadFilterConfig(filterProperties, FilterManager.class.getClassLoader());
         loadFilterConfig(filterProperties, Thread.currentThread().getContextClassLoader());
@@ -76,6 +96,12 @@ public class FilterManager {
         return filterProperties;
     }
 
+    /**
+     * 加载 druid 拦截器相关属性
+     * @param filterProperties  抽取出来的属性会保存到 prop 中
+     * @param classLoader  用于读取属性的类加载器
+     * @throws IOException
+     */
     private static void loadFilterConfig(Properties filterProperties, ClassLoader classLoader) throws IOException {
         if (classLoader == null) {
             return;
@@ -98,15 +124,25 @@ public class FilterManager {
         }
     }
 
+    /**
+     * 首先通过filterName 找到对应的拦截器 之后添加到 filters 中
+     * @param filters
+     * @param filterName  该name 可能是 别名 也可能是全限定名
+     * @throws SQLException
+     */
     public static void loadFilter(List<Filter> filters, String filterName) throws SQLException {
         if (filterName.length() == 0) {
             return;
         }
 
+        // 找到对应filter 的全限定名
         String filterClassNames = getFilter(filterName);
 
+        // 代表是别名 并且找到了 实现类名
         if (filterClassNames != null) {
+            // 可能有些拦截器 别名对应多个类
             for (String filterClassName : filterClassNames.split(",")) {
+                // 如果在这组拦截器中已经存在了 目标拦截器 就跳过
                 if (existsFilter(filters, filterClassName)) {
                     continue;
                 }
@@ -139,6 +175,7 @@ public class FilterManager {
             return;
         }
 
+        // 进入这里代表  filterName 本身就是全限定名 已经存在就不处理 否则初始化并添加到list 中
         if (existsFilter(filters, filterName)) {
             return;
         }
@@ -157,9 +194,17 @@ public class FilterManager {
         }
     }
 
+    /**
+     * 从一组 过滤器中 判断是否有包含指定的过滤器
+     * @param filterList
+     * @param filterClassName
+     * @return
+     */
     private static boolean existsFilter(List<Filter> filterList, String filterClassName) {
         for (Filter filter : filterList) {
+            // 获取全限定名
             String itemFilterClassName = filter.getClass().getName();
+            // 名字匹配返回true
             if (itemFilterClassName.equalsIgnoreCase(filterClassName)) {
                 return true;
             }

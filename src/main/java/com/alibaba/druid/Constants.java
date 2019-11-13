@@ -15,9 +15,18 @@
  */
 package com.alibaba.druid;
 
+/**
+ * 常量信息
+ */
 public interface Constants {
 
+    /**
+     * 每次最多统计的sql数量
+     */
     public final static String DRUID_STAT_SQL_MAX_SIZE             = "druid.stat.sql.MaxSize";
 
+    /**
+     * 2次统计的时间间隔
+     */
     public final static String DRUID_TIME_BETWEEN_LOG_STATS_MILLIS = "druid.timeBetweenLogStatsMillis";
 }

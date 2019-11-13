@@ -18,7 +18,9 @@ package com.alibaba.druid.sql.dialect.mysql.ast;
 import com.alibaba.druid.sql.ast.SQLObject;
 import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlASTVisitor;
 
-
+/**
+ * 对应mysql 中的数据对象
+ */
 public interface MySqlObject extends SQLObject {
     void accept0(MySqlASTVisitor visitor);
 }

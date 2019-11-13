@@ -14,9 +14,11 @@ package com.alibaba.druid.wall;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * 基于 table 的统计信息
  */
 public class WallSqlTableStat {
 
+    // 该表不同类型语句的次数
     private int    selectCount;
     private int    selectIntoCount;
     private int    insertCount;
@@ -29,6 +31,9 @@ public class WallSqlTableStat {
     private int    replaceCount;
     private int    showCount;
 
+    /**
+     * 样本是指什么???
+     */
     private String sample;
 
     public String getSample() {

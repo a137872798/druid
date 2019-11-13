@@ -17,6 +17,9 @@ package com.alibaba.druid.sql.dialect.mysql.ast.expr;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
 
+/**
+ * 针对 mysql 的sql表达式
+ */
 public interface MySqlExpr extends SQLExpr {
 
 }

@@ -17,12 +17,34 @@ package com.alibaba.druid.sql.ast;
 
 import java.util.List;
 
+/**
+ * 会话对象也是实现sqlObject 接口
+ */
 public interface SQLStatement extends SQLObject {
+    /**
+     * 获取db类型
+     * @return
+     */
     String          getDbType();
     boolean         isAfterSemi();
     void            setAfterSemi(boolean afterSemi);
+
+    /**
+     * 生成副本对象
+     * @return
+     */
     SQLStatement    clone();
+
+    /**
+     * 获取子对象列表
+     * @return
+     */
     List<SQLObject> getChildren();
+
+    /**
+     * 返回小写字符串
+     * @return
+     */
     String          toLowerCaseString();
 
     List<SQLCommentHint> getHeadHintsDirect();

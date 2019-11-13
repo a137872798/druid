@@ -17,10 +17,19 @@ package com.alibaba.druid.wall.violation;
 
 import com.alibaba.druid.wall.Violation;
 
+/**
+ * 语法错误
+ */
 public class SyntaxErrorViolation implements Violation {
 
+    /**
+     * 对应的异常
+     */
     private final Exception exception;
 
+    /**
+     * 执行的sql
+     */
     private final String    sql;
 
     public SyntaxErrorViolation(Exception exception, String sql){

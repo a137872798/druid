@@ -84,6 +84,9 @@ public class SQLUtils {
     };
 
     public static FormatOption DEFAULT_FORMAT_OPTION = new FormatOption(true, true);
+    /**
+     * 以小写输出的格式
+     */
     public static FormatOption DEFAULT_LCASE_FORMAT_OPTION
             = new FormatOption(false, true);
 
@@ -93,8 +96,16 @@ public class SQLUtils {
         return toSQLString(sqlObject, dbType, null);
     }
 
+    /**
+     * 传入 SQLObject 对象 并根据 db类型和 格式生成对应的字符串
+     * @param sqlObject
+     * @param dbType
+     * @param option
+     * @return
+     */
     public static String toSQLString(SQLObject sqlObject, String dbType, FormatOption option) {
         StringBuilder out = new StringBuilder();
+        // 将builder 构建成输出对象
         SQLASTOutputVisitor visitor = createOutputVisitor(out, dbType);
 
         if (option == null) {
@@ -215,6 +226,12 @@ public class SQLUtils {
         return format(sql, JdbcConstants.POSTGRESQL, option);
     }
 
+    /**
+     * 根据sql  和 db类型 生成sql 表达式
+     * @param sql
+     * @param dbType
+     * @return
+     */
     public static SQLExpr toSQLExpr(String sql, String dbType) {
         SQLExprParser parser = SQLParserUtils.createExprParser(sql, dbType);
         SQLExpr expr = parser.expr();
@@ -393,6 +410,12 @@ public class SQLUtils {
         return out.toString();
     }
 
+    /**
+     * 通过一个 append 对象 和 db类型生成输出对象
+     * @param out   一般情况就是 stringBuffer
+     * @param dbType
+     * @return
+     */
     public static SQLASTOutputVisitor createOutputVisitor(Appendable out, String dbType) {
         return createFormatOutputVisitor(out, null, dbType);
     }
@@ -717,6 +740,9 @@ public class SQLUtils {
         selectItem.setParent(selectItem);
     }
 
+    /**
+     * 格式对象  内部包含一个 特征属性
+     */
     public static class FormatOption {
         private int features = VisitorFeature.of(VisitorFeature.OutputUCase
                 , VisitorFeature.OutputPrettyFormat);
@@ -733,10 +759,21 @@ public class SQLUtils {
             this(ucase, true);
         }
 
+        /**
+         *
+         * @param ucase  是否大写
+         * @param prettyFormat  是否使用完美格式
+         */
         public FormatOption(boolean ucase, boolean prettyFormat) {
             this(ucase, prettyFormat, false);
         }
 
+        /**
+         *
+         * @param ucase  是否采用大写输出
+         * @param prettyFormat  是否使用完美格式
+         * @param parameterized   是否参数化
+         */
         public FormatOption(boolean ucase, boolean prettyFormat, boolean parameterized) {
             this.features = VisitorFeature.config(this.features, VisitorFeature.OutputUCase, ucase);
             this.features = VisitorFeature.config(this.features, VisitorFeature.OutputPrettyFormat, prettyFormat);

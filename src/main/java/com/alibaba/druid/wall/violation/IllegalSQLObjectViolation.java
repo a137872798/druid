@@ -17,10 +17,22 @@ package com.alibaba.druid.wall.violation;
 
 import com.alibaba.druid.wall.Violation;
 
+/**
+ * 非法的sql
+ */
 public class IllegalSQLObjectViolation implements Violation {
 
+    /**
+     * 记录错误提示信息
+     */
     private final String message;
+    /**
+     * 这是???
+     */
     private final String sqlPart;
+    /**
+     * 错误码
+     */
     private final int errorCode;
 
     public IllegalSQLObjectViolation(int errorCode, String message, String sqlPart){

@@ -201,6 +201,11 @@ public class Utils {
         return null;
     }
 
+    /**
+     * 通过类名 获取class 对象
+     * @param className
+     * @return
+     */
     public static Class<?> loadClass(String className) {
         Class<?> clazz = null;
 
@@ -209,11 +214,13 @@ public class Utils {
         }
 
         try {
+            // forName 应该是用了某种默认的类加载器
             return Class.forName(className);
         } catch (ClassNotFoundException e) {
             // skip
         }
 
+        // 这里指定另一个类加载器进行加载
         ClassLoader ctxClassLoader = Thread.currentThread().getContextClassLoader();
         if (ctxClassLoader != null) {
             try {

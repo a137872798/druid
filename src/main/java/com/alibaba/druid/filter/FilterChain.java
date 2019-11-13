@@ -54,26 +54,77 @@ import com.alibaba.druid.proxy.jdbc.ResultSetProxy;
 import com.alibaba.druid.proxy.jdbc.StatementProxy;
 
 /**
+ * 过滤链接口   filter 生成代理对象就是将 jdbc原生对象(加上一些必要参数)通过过滤链层层处理后返回的
  * @author wenshao [szujobs@hotmail.com]
  */
 public interface FilterChain {
 
+    /**
+     * 返回链中的 数据源代理
+     * @return
+     */
     DataSourceProxy getDataSource();
 
+    /**
+     * 返回本过滤链的大小
+     * @return
+     */
     int getFilterSize();
 
+    /**
+     * 获取当前的下标
+     * @return
+     */
     int getPos();
 
+    /**
+     * 生成一个过滤链副本
+     * @return
+     */
     FilterChain cloneChain();
 
+    /**
+     * 将包装对象解包装后生成需要的类型
+     * @param wrapper   被包装对象
+     * @param iface     目标类型
+     * @param <T>
+     * @return
+     * @throws java.sql.SQLException
+     */
     <T> T unwrap(Wrapper wrapper, java.lang.Class<T> iface) throws java.sql.SQLException;
 
+    /**
+     * 判断传入的包装对象是否是 iface 的包装器
+     * @param wrapper
+     * @param iface
+     * @return
+     * @throws java.sql.SQLException
+     */
     boolean isWrapperFor(Wrapper wrapper, java.lang.Class<?> iface) throws java.sql.SQLException;
 
+    /**
+     * 根据配置信息生成conn 对象
+     * @param info
+     * @return
+     * @throws SQLException
+     */
     ConnectionProxy connection_connect(Properties info) throws SQLException;
 
+    /**
+     * 通过conn 创建会话对象
+     * @param connection
+     * @return
+     * @throws SQLException
+     */
     StatementProxy connection_createStatement(ConnectionProxy connection) throws SQLException;
 
+    /**
+     * 通过conn 创建 PS 对象
+     * @param connection
+     * @param sql
+     * @return
+     * @throws SQLException
+     */
     PreparedStatementProxy connection_prepareStatement(ConnectionProxy connection, String sql) throws SQLException;
 
     CallableStatementProxy connection_prepareCall(ConnectionProxy connection, String sql) throws SQLException;

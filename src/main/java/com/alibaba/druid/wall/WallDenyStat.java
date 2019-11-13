@@ -18,12 +18,24 @@ package com.alibaba.druid.wall;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 
+/**
+ * 统计 否定相关信息
+ */
 public class WallDenyStat {
 
+    /**
+     * 否定次数
+     */
     private volatile long                             denyCount;
 
+    /**
+     * 上一次否定时间
+     */
     private volatile long                             lastDenyTimeMillis;
 
+    /**
+     * 重置次数
+     */
     private volatile long                             resetCount;
 
     final static AtomicLongFieldUpdater<WallDenyStat> denyCountUpdater  = AtomicLongFieldUpdater.newUpdater(WallDenyStat.class,
@@ -32,6 +44,10 @@ public class WallDenyStat {
     final static AtomicLongFieldUpdater<WallDenyStat> resetCountUpdater = AtomicLongFieldUpdater.newUpdater(WallDenyStat.class,
                                                                                                             "resetCount");
 
+    /**
+     * 增加否定次数
+     * @return
+     */
     public long incrementAndGetDenyCount() {
         lastDenyTimeMillis = System.currentTimeMillis();
         return denyCountUpdater.incrementAndGet(this);
@@ -48,6 +64,9 @@ public class WallDenyStat {
         return new Date(lastDenyTimeMillis);
     }
 
+    /**
+     * 重置denyCount 同时 增加 resetCount
+     */
     public void reset() {
         lastDenyTimeMillis = 0;
         denyCount = 0;

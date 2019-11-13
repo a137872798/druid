@@ -29,6 +29,9 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.wall.spi.WallVisitorUtils;
 
+/**
+ * 拦截对象配置 因为实现了 MBean 接口 允许使用java 工具修改属性
+ */
 public class WallConfig implements WallConfigMBean {
 
     private boolean             noneBaseStatementAllow      = false;

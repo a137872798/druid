@@ -21,8 +21,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 
+/**
+ * 方法级别的统计对象
+ */
 public class WallFunctionStat {
 
+    /**
+     * 本方法被调用次数
+     */
     private volatile long                                 invokeCount;
     final static AtomicLongFieldUpdater<WallFunctionStat> invokeCountUpdater = AtomicLongFieldUpdater.newUpdater(WallFunctionStat.class,
                                                                                                                  "invokeCount");
@@ -49,6 +55,11 @@ public class WallFunctionStat {
         return map;
     }
 
+    /**
+     * 将本统计对象的数据抽取出来 并设置到 statValue 中
+     * @param reset
+     * @return
+     */
     public WallFunctionStatValue getStatValue(boolean reset) {
         WallFunctionStatValue statValue = new WallFunctionStatValue();
         statValue.setInvokeCount(get(this, invokeCountUpdater, reset));

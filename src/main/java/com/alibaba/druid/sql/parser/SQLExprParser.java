@@ -100,10 +100,19 @@ import com.alibaba.druid.sql.dialect.postgresql.ast.expr.PGTypeCastExpr;
 import com.alibaba.druid.util.FnvHash;
 import com.alibaba.druid.util.JdbcConstants;
 
+/**
+ * sql 表达式解析器
+ */
 public class SQLExprParser extends SQLParser {
 
+    /**
+     * 聚合方法
+     */
     public final static String[] AGGREGATE_FUNCTIONS;
 
+    /**
+     * 对应的hash数组
+     */
     public final static long[] AGGREGATE_FUNCTIONS_CODES;
 
     static {
@@ -1342,7 +1351,7 @@ public class SQLExprParser extends SQLParser {
                     || lexer.token == Token.LITERAL_ALIAS) {
                 name = lexer.stringVal();
                 lexer.nextToken();
-            } else if (lexer.getKeywods().containsValue(lexer.token)) {
+            } else if (lexer.getkeywords().containsValue(lexer.token)) {
                 name = lexer.stringVal();
                 lexer.nextToken();
             } else {
@@ -1581,7 +1590,7 @@ public class SQLExprParser extends SQLParser {
             }
 
             if (lexer.token != Token.LITERAL_ALIAS && lexer.token != Token.IDENTIFIER
-                && (!lexer.getKeywods().containsValue(lexer.token))) {
+                && (!lexer.getkeywords().containsValue(lexer.token))) {
                 throw new ParserException("error, " + lexer.info());
             }
 

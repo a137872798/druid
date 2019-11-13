@@ -15,10 +15,25 @@
  */
 package com.alibaba.druid.sql.visitor;
 
+/**
+ * 可打印的观察者对象
+ */
 public interface PrintableVisitor extends SQLASTVisitor {
+    /**
+     * 当前是否是大写
+     * @return
+     */
     boolean isUppCase();
 
+    /**
+     * 输出字符
+     * @param value
+     */
     void print(char value);
 
+    /**
+     * 输出文本
+     * @param text
+     */
     void print(String text);
 }

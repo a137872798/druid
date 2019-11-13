@@ -18,6 +18,11 @@ package com.alibaba.druid.util;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * 删除最早插入元素
+ * @param <K>
+ * @param <V>
+ */
 public class LRUCache<K, V> extends LinkedHashMap<K, V> {
 
     private static final long serialVersionUID = 1L;

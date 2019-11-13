@@ -15,6 +15,9 @@
  */
 package com.alibaba.druid.sql.parser;
 
+/**
+ * 代表解析到末尾了
+ */
 @SuppressWarnings("serial")
 public class EOFParserException extends ParserException {
 

@@ -19,12 +19,27 @@ import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement;
 import com.alibaba.druid.util.FnvHash;
 import com.alibaba.druid.util.StringUtils;
 
+/**
+ * sql 解析器   sharding-sphere 应该也有类似的实现
+ */
 public class SQLParser {
+    /**
+     * 词法解析器
+     */
     protected final Lexer lexer;
+    /**
+     * 数据库类型
+     */
     protected String      dbType;
 
+    /**
+     * 通过sql 语句初始化解析器对象
+     * @param sql
+     * @param dbType  传入db类型是因为 不同的 db 词法方面会有些微不同  允许dbType 为空 那么都按默认的词法进行解析
+     */
     public SQLParser(String sql, String dbType){
         this(new Lexer(sql, null, dbType), dbType);
+        // 一旦 lexer 对象被初始化 就会调用nextToken 获取第一个关键字信息
         this.lexer.nextToken();
     }
 
@@ -49,25 +64,43 @@ public class SQLParser {
         return dbType;
     }
 
+    /**
+     * 当前解析到的位置是否与 传入文本一致
+     * @param text
+     * @return
+     */
     protected boolean identifierEquals(String text) {
         return lexer.identifierEquals(text);
     }
 
     protected void acceptIdentifier(String text) {
+        // 如果相同就继续解析下一个token
         if (lexer.identifierEquals(text)) {
             lexer.nextToken();
         } else {
+            // 否则设置异常信息
             setErrorEndPos(lexer.pos());
+            // 抛出异常
             throw new ParserException("syntax error, expect " + text + ", actual " + lexer.token + ", " + lexer.info());
         }
     }
 
+    /**
+     * 获取表别名
+     * @return
+     */
     protected String tableAlias() {
         return tableAlias(false);
     }
 
+    /**
+     * 获取表别名
+     * @param must  是否必要
+     * @return
+     */
     protected String tableAlias(boolean must) {
         final Token token = lexer.token;
+        // 这些类型不能返回
         if (token == Token.CONNECT
                 || token == Token.START
                 || token == Token.SELECT
@@ -79,13 +112,19 @@ public class SQLParser {
             return null;
         }
 
+        // 如果是 IDENTIFIER 类型
         if (token == Token.IDENTIFIER) {
+            // 获取当前解析出来的字符串
             String ident = lexer.stringVal;
+            // 获取当前hash值
             long hash = lexer.hash_lower;
+            // 如果忽略名字引用  `` '' "" 这种
             if (isEnabled(SQLParserFeature.IgnoreNameQuotes) && ident.length() > 1) {
+                // 移除掉名字引用的部分
                 ident = StringUtils.removeNameQuotes(ident);
             }
 
+            // hash值必须合法
             if (hash == FnvHash.Constants.START
                     || hash == FnvHash.Constants.CONNECT
                     || hash == FnvHash.Constants.NATURAL
@@ -96,15 +135,20 @@ public class SQLParser {
                     throw new ParserException("illegal alias. " + lexer.info());
                 }
 
+                // 当没有设置必须返回时 尝试着生成
+                // 获取当前保存点
                 Lexer.SavePoint mark = lexer.mark();
+                // 解析下一个token
                 lexer.nextToken();
                 switch (lexer.token) {
                     case EOF:
                     case COMMA:
                     case WHERE:
                     case INNER:
+                        // 以上情况 允许返回 字符串
                         return ident;
                     default:
+                        // 恢复 lexer 的指针
                         lexer.reset(mark);
                         break;
                 }
@@ -112,10 +156,14 @@ public class SQLParser {
                 return null;
             }
 
+            // 代表 hash不属于上面描述的那些
             if (!must) {
+                // 如果是 model 模式
                 if (hash == FnvHash.Constants.MODEL) {
+                    // 记录当前位置 并获取下一个token
                     Lexer.SavePoint mark = lexer.mark();
                     lexer.nextToken();
+                    // 这些不满足
                     if (lexer.token == Token.PARTITION
                             || lexer.token == Token.UNION
                             || lexer.identifierEquals(FnvHash.Constants.DIMENSION)
@@ -124,7 +172,9 @@ public class SQLParser {
                         lexer.reset(mark);
                         return null;
                     }
+                    // 注意能返回 别名的时候 lexer的指针没有回退
                     return ident;
+                    // 如果当前hash 是window 类型
                 } else if (hash == FnvHash.Constants.WINDOW) {
                     Lexer.SavePoint mark = lexer.mark();
                     lexer.nextToken();
@@ -133,6 +183,7 @@ public class SQLParser {
                         return null;
                     }
                     return ident;
+                    // 套路类似 就是如果 hash 是某种形式 然后 下一个token是某种形式 就认为可以返回 别名
                 } else if (hash == FnvHash.Constants.DISTRIBUTE
                         || hash == FnvHash.Constants.SORT
                         || hash == FnvHash.Constants.CLUSTER
@@ -148,24 +199,32 @@ public class SQLParser {
             }
         }
 
+        // 以上类型 hash 都没有匹配成功时  通过as 方法寻找别名
         return this.as();
     }
 
+    /**
+     * 寻找 AS 后面的字符
+     * @return
+     */
     protected String as() {
         String alias = null;
 
         final Token token = lexer.token;
 
+        // 如果是 , 直接返回
         if (token == Token.COMMA) {
             return null;
         }
 
+        // 如果匹配上 AS 那么 后面的应该就是表名
         if (token == Token.AS) {
             lexer.nextToken();
             alias = lexer.stringVal();
             lexer.nextToken();
 
             if (alias != null) {
+                // 如果是 .   那么 应该是  AS  xxx.yyy
                 while (lexer.token == Token.DOT) {
                     lexer.nextToken();
                     alias += ('.' + lexer.token.name());
@@ -175,16 +234,22 @@ public class SQLParser {
                 return alias;
             }
 
+            // 如果是 AS (   返回null
             if (lexer.token == Token.LPAREN) {
                 return null;
             }
 
+            // 其余情况 解析异常
             throw new ParserException("Error : " + lexer.info());
         }
 
+        // 如果当前token 代表别名
         if (lexer.token == Token.LITERAL_ALIAS) {
+            // 获取别名
             alias = lexer.stringVal();
+            // 解析下个数据
             lexer.nextToken();
+        // 如果是特征数值
         } else if (lexer.token == Token.IDENTIFIER) {
             alias = lexer.stringVal();
             lexer.nextToken();
@@ -210,10 +275,12 @@ public class SQLParser {
             }
         }
 
+        // 这里已经是下一个token 了
         switch (lexer.token) {
             case KEY:
             case INTERVAL:
             case CONSTRAINT:
+                // 将别名替换成这个
                 alias = lexer.token.name();
                 lexer.nextToken();
                 return alias;
@@ -224,6 +291,10 @@ public class SQLParser {
         return alias;
     }
 
+    /**
+     * 这个别名是什么???
+     * @return
+     */
     protected String alias() {
         String alias = null;
         if (lexer.token == Token.LITERAL_ALIAS) {
@@ -317,6 +388,10 @@ public class SQLParser {
         return alias;
     }
 
+    /**
+     * 打印异常信息  该方法不细看
+     * @param token
+     */
     protected void printError(Token token) {
         String arround;
         if (lexer.mark >= 0 && (lexer.text.length() > lexer.mark + 30)) {
@@ -344,7 +419,12 @@ public class SQLParser {
                                   + lexer.token + " " + lexer.info());
     }
 
+    /**
+     * 接受某个token
+     * @param token
+     */
     public void accept(Token token) {
+        // 当token 匹配的情况往下走
         if (lexer.token == token) {
             lexer.nextToken();
         } else {
@@ -353,7 +433,12 @@ public class SQLParser {
         }
     }
 
+    /**
+     * 接受某个int
+     * @return
+     */
     public int acceptInteger() {
+        // 首先确保当前解析出来的token 是int 类型 返回int 并解析下一个token
         if (lexer.token == Token.LITERAL_INT) {
             int intVal = ((Integer) lexer.integerValue()).intValue();
             lexer.nextToken();
@@ -364,6 +449,10 @@ public class SQLParser {
         }
     }
 
+    /**
+     * 判断当前token 是否匹配传入的token 不匹配抛出异常
+     * @param token
+     */
     public void match(Token token) {
         if (lexer.token != token) {
             throw new ParserException("syntax error, expect " + token + ", actual " + lexer.token + " "
@@ -371,22 +460,43 @@ public class SQLParser {
         }
     }
 
+    /**
+     * 解析发生异常的指针
+     */
     private int errorEndPos = -1;
 
+    /**
+     * 设置异常信息
+     * @param errPos  代表出现异常的光标
+     */
     protected void setErrorEndPos(int errPos) {
+        // 这里是更新异常光标 (取最大的???)
         if (errPos > errorEndPos) {
             errorEndPos = errPos;
         }
     }
 
+    /**
+     * @param feature
+     * @param state  代表追加特性还是去除特性
+     */
     public void config(SQLParserFeature feature, boolean state) {
         this.lexer.config(feature, state);
     }
 
+    /**
+     * 当前词法解析器是否含有某个特性
+     * @param feature
+     * @return
+     */
     public final boolean isEnabled(SQLParserFeature feature) {
         return lexer.isEnabled(feature);
     }
 
+    /**
+     * 创建一个会话对象
+     * @return
+     */
     protected SQLCreateTableStatement newCreateStatement() {
         return new SQLCreateTableStatement(getDbType());
     }

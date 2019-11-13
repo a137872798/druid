@@ -18,6 +18,9 @@ package com.alibaba.druid.sql.ast.statement;
 import com.alibaba.druid.sql.ast.SQLStatement;
 
 
+/**
+ * DDL 语句的会话对象  对应 CREATE DROP
+ */
 public interface SQLDDLStatement extends SQLStatement {
 
 }

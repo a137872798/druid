@@ -130,6 +130,9 @@ import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlUpdateTableSource;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MysqlDeallocatePrepareStatement;
 import com.alibaba.druid.sql.visitor.SQLASTVisitor;
 
+/**
+ * mysql观察者专用的方法 注意该对象同时 2套api
+ */
 public interface MySqlASTVisitor extends SQLASTVisitor {
     boolean visit(MySqlTableIndex x);
 

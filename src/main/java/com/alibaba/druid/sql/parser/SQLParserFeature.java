@@ -15,14 +15,38 @@
  */
 package com.alibaba.druid.sql.parser;
 
+/**
+ * sql解析器特性
+ */
 public enum SQLParserFeature {
+    /**
+     * 保留insert 的原始语句
+     */
     KeepInsertValueClauseOriginalString,
+    /**
+     * 保留 select 的原始语句
+     */
     KeepSelectListOriginalString, // for improved sql parameterized performance
+    /**
+     * 使用列缓存
+     */
     UseInsertColumnsCache,
+    /**
+     * 使用过期组
+     */
     EnableSQLBinaryOpExprGroup,
+    /**
+     * 优化 参数化
+     */
     OptimizedForParameterized,
     OptimizedForForParameterizedSkipValue,
+    /**
+     * 保持评论
+     */
     KeepComments,
+    /**
+     * 跳过评论 啥意思???
+     */
     SkipComments,
     StrictForWall,
     EnableMultiUnion,

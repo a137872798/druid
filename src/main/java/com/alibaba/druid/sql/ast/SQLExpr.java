@@ -17,8 +17,21 @@ package com.alibaba.druid.sql.ast;
 
 import java.util.List;
 
+/**
+ * sql表达式
+ */
 public interface SQLExpr extends SQLObject, Cloneable {
     SQLExpr     clone();
+
+    /**
+     * 计算数据类型
+     * @return
+     */
     SQLDataType computeDataType();
+
+    /**
+     * 获取所有子对象
+     * @return
+     */
     List<SQLObject> getChildren();
 }

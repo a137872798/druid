@@ -61,6 +61,9 @@ public class CharTypes {
         return c != '　' && c != '，';
     }
 
+    /**
+     * 该对象作为缓存 避免每次获取char 反复转化为string 类型
+     */
     private final static String[] stringCache = new String[256];
     private final static boolean[] identifierFlags = new boolean[256];
     static {

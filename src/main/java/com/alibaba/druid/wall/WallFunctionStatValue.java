@@ -25,9 +25,15 @@ import com.alibaba.druid.support.monitor.annotation.MTable;
 @MTable(name = "druid_wall_function")
 public class WallFunctionStatValue {
 
+    /**
+     * 指定的方法名
+     */
     @MField(groupBy=true, aggregate=AggregateType.None)
     private String name;
 
+    /**
+     * 该方法的调用次数
+     */
     @MField(aggregate=AggregateType.Sum)
     private long   invokeCount;
 

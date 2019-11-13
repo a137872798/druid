@@ -56,6 +56,8 @@ import com.alibaba.druid.proxy.jdbc.StatementProxy;
 
 /**
  * 提供JdbcFilter的基本实现，使得实现一个JdbcFilter更容易。
+ * 该对象内部的方法 都委托给chain
+ * NotificationBroadcasterSupport 是一个简单的 观察者-消费者模式
  * 
  * @author wenshao [szujobs@hotmail.com]
  */

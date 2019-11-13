@@ -15,5 +15,8 @@
  */
 package com.alibaba.druid.sql.ast.statement;
 
+/**
+ * 创建会话
+ */
 public interface SQLCreateStatement extends SQLDDLStatement {
 }

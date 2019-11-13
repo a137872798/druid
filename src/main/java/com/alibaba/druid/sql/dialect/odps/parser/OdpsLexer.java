@@ -54,19 +54,19 @@ public class OdpsLexer extends Lexer {
 
     public OdpsLexer(String input){
         super(input);
-        super.keywods = DEFAULT_ODPS_KEYWORDS;
+        super.keywords = DEFAULT_ODPS_KEYWORDS;
     }
     
     public OdpsLexer(String input, boolean skipComment, boolean keepComments){
         super(input, skipComment);
         this.skipComment = skipComment;
         this.keepComments = keepComments;
-        super.keywods = DEFAULT_ODPS_KEYWORDS;
+        super.keywords = DEFAULT_ODPS_KEYWORDS;
     }
     
     public OdpsLexer(String input, CommentHandler commentHandler){
         super(input, commentHandler);
-        super.keywods = DEFAULT_ODPS_KEYWORDS;
+        super.keywords = DEFAULT_ODPS_KEYWORDS;
     }
     
     public void scanComment() {
@@ -261,7 +261,7 @@ public class OdpsLexer extends Lexer {
         this.ch = charAt(pos);
 
         stringVal = addSymbol();
-        Token tok = keywods.getKeyword(stringVal);
+        Token tok = keywords.getKeyword(stringVal);
         if (tok != null) {
             token = tok;
         } else {

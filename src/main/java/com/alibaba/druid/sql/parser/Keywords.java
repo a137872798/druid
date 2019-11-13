@@ -22,18 +22,23 @@ import java.util.Map;
 import com.alibaba.druid.util.Utils;
 
 /**
+ * 内部维护了所有的db关键字
+ *
  * @author wenshao [szujobs@hotmail.com]
  */
 public class Keywords {
 
     private final Map<String, Token> keywords;
 
+    /**
+     * hasArray 中的元素 对应到tokens 中元素的 hash  同时 tokens 内部的元素顺序按照 hash 顺序排序
+     */
     private long[] hashArray;
     private Token[] tokens;
 
-    public final static Keywords     DEFAULT_KEYWORDS;
+    public final static Keywords DEFAULT_KEYWORDS;
 
-    public final static Keywords     SQLITE_KEYWORDS;
+    public final static Keywords SQLITE_KEYWORDS;
 
     static {
         Map<String, Token> map = new HashMap<String, Token>();
@@ -142,7 +147,7 @@ public class Keywords {
         map.put("WITH", Token.WITH);
         map.put("GRANT", Token.GRANT);
         map.put("REVOKE", Token.REVOKE);
-        
+
         // MySql procedure: add by zz
         map.put("WHILE", Token.WHILE);
         map.put("DO", Token.DO);
@@ -160,8 +165,11 @@ public class Keywords {
         map.put("INOUT", Token.INOUT);
         map.put("LIMIT", Token.LIMIT);
 
+        // 在初始化阶段将所有 关键字映射保存到 map中
+
         DEFAULT_KEYWORDS = new Keywords(map);
 
+        // sqliteMap 在原有基础上增加一个 limit关键字
         Map<String, Token> sqlitemap = new HashMap<String, Token>();
 
         sqlitemap.putAll(Keywords.DEFAULT_KEYWORDS.getKeywords());
@@ -170,11 +178,22 @@ public class Keywords {
         SQLITE_KEYWORDS = new Keywords(sqlitemap);
     }
 
+    /**
+     * 判断是否包含某个 token
+     *
+     * @param token
+     * @return
+     */
     public boolean containsValue(Token token) {
         return this.keywords.containsValue(token);
     }
 
-    public Keywords(Map<String, Token> keywords){
+    /**
+     * 通过关键字映射来初始化该对象
+     *
+     * @param keywords
+     */
+    public Keywords(Map<String, Token> keywords) {
         this.keywords = keywords;
 
         this.hashArray = new long[keywords.size()];
@@ -192,13 +211,18 @@ public class Keywords {
         }
     }
 
-public Token getKeyword(long hash) {
-    int index = Arrays.binarySearch(hashArray, hash);
-    if (index < 0) {
-        return null;
+    /**
+     * 通过hash 查找关键字
+     * @param hash
+     * @return
+     */
+    public Token getKeyword(long hash) {
+        int index = Arrays.binarySearch(hashArray, hash);
+        if (index < 0) {
+            return null;
+        }
+        return tokens[index];
     }
-    return tokens[index];
-}
 
     public Token getKeyword(String key) {
         long k = Utils.fnv_64_lower(key);

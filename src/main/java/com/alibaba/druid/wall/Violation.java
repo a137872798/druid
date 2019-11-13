@@ -15,10 +15,21 @@
  */
 package com.alibaba.druid.wall;
 
+/**
+ * 可以理解为一种异常情况
+ */
 public interface Violation {
 
+    /**
+     * 获取异常code
+     * @return
+     */
     int getErrorCode();
 
+    /**
+     * 获取错误描述消息
+     * @return
+     */
     String getMessage();
 
     String toString();

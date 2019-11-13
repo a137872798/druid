@@ -38,9 +38,13 @@ import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.util.FnvHash;
 
 /**
+ * 模式对象
  * Created by wenshao on 21/07/2017.
  */
 public class Schema {
+    /**
+     * 该模式的名字
+     */
     private String name;
 
     protected final Map<Long, SchemaObject> objects = new ConcurrentHashMap<Long, SchemaObject>();

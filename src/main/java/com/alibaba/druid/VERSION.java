@@ -15,6 +15,9 @@
  */
 package com.alibaba.druid;
 
+/**
+ * 版本号信息 目前是 1.1.21
+ */
 public final class VERSION {
 
     public final static int MajorVersion    = 1;

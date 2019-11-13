@@ -17,15 +17,38 @@ package com.alibaba.druid.sql.visitor;
 
 import java.util.List;
 
+/**
+ * 参数化观察者   实现可打印观察者接口
+ */
 public interface ParameterizedVisitor extends PrintableVisitor {
 
+    /**
+     * 需要被替换的参数数量
+     * @return
+     */
     int getReplaceCount();
 
+    /**
+     * 增加需要被替换的参数数量
+     */
     void incrementReplaceCunt();
 
+    /**
+     * 获取数据库类型
+     * @return
+     */
     String getDbType();
 
+    /**
+     * 设置输出参数
+     * @param parameters
+     */
     void setOutputParameters(List<Object> parameters);
 
+    /**
+     * 通过feature 来配置该对象
+     * @param feature
+     * @param state
+     */
     void config(VisitorFeature feature, boolean state);
 }

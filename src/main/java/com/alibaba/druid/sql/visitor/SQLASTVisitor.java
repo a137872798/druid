@@ -88,6 +88,9 @@ import com.alibaba.druid.sql.ast.expr.SQLValuesExpr;
 import com.alibaba.druid.sql.ast.expr.SQLVariantRefExpr;
 import com.alibaba.druid.sql.ast.statement.*;
 
+/**
+ * 观察者对象 可以添加到 SqlObject 中
+ */
 public interface SQLASTVisitor {
 
     void endVisit(SQLAllColumnExpr x);
